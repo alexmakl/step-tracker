@@ -28,9 +28,13 @@ import HealthKit
                                                                options: .cumulativeSum,
                                                                anchorDate: endDate,
                                                                intervalComponents: .init(day: 1))
-        let stepCounts = try! await stepsQuery.result(for: store)
-        stepData = stepCounts.statistics().map {
-            HealthMetric(date: $0.startDate, value: $0.sumQuantity()?.doubleValue(for: .count()) ?? 0)
+        do {
+            let stepCounts = try await stepsQuery.result(for: store)
+            stepData = stepCounts.statistics().map {
+                HealthMetric(date: $0.startDate, value: $0.sumQuantity()?.doubleValue(for: .count()) ?? 0)
+            }
+        } catch {
+            
         }
     }
     
@@ -46,9 +50,13 @@ import HealthKit
                                                                options: .mostRecent,
                                                                anchorDate: endDate,
                                                                intervalComponents: .init(day: 1))
-        let weightCounts = try! await weightsQuery.result(for: store)
-        weightData = weightCounts.statistics().map {
-            HealthMetric(date: $0.startDate, value: $0.mostRecentQuantity()?.doubleValue(for: .pound()) ?? 0)
+        do {
+            let weightCounts = try await weightsQuery.result(for: store)
+            weightData = weightCounts.statistics().map {
+                HealthMetric(date: $0.startDate, value: $0.mostRecentQuantity()?.doubleValue(for: .pound()) ?? 0)
+            }
+        } catch {
+            
         }
     }
     
