@@ -19,6 +19,11 @@ struct WeightLineChart: View {
         chartData.map { $0.value }.min() ?? 0
     }
     
+    var averageWeight: Int {
+        let total = chartData.reduce(0) { $0 + $1.value }
+        return Int(total) / chartData.count
+    }
+    
     var selectedHealthMetric: HealthMetric? {
         guard let rawSelectedDate else { return nil }
         return chartData.first {
@@ -34,7 +39,7 @@ struct WeightLineChart: View {
                         Label("Weight", systemImage: "figure")
                             .font(.title3)
                             .foregroundStyle(.indigo)
-                        Text("Avg: 180 lbs")
+                        Text("Avg: \(averageWeight) lbs")
                             .font(.caption)
                     }
                     
