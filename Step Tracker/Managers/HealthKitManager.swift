@@ -16,6 +16,7 @@ import HealthKit
     
     var stepData: [HealthMetric] = []
     var weightData: [HealthMetric] = []
+    var weightDiffData: [HealthMetric] = []
     
     func fetchStepsCount() async {
         let calendar = Calendar.current
@@ -53,6 +54,28 @@ import HealthKit
         do {
             let weightCounts = try await weightsQuery.result(for: store)
             weightData = weightCounts.statistics().map {
+                HealthMetric(date: $0.startDate, value: $0.mostRecentQuantity()?.doubleValue(for: .pound()) ?? 0)
+            }
+        } catch {
+            
+        }
+    }
+    
+    func fetchWeightsForDifferentials() async {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: .now)
+        let endDate = calendar.date(byAdding: .day, value: 1, to: today)!
+        let startDate = calendar.date(byAdding: .day, value: -29, to: endDate)
+        
+        let queryPredicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate)
+        let samplePredicate = HKSamplePredicate.quantitySample(type: HKQuantityType(.bodyMass), predicate: queryPredicate)
+        let weightsQuery = HKStatisticsCollectionQueryDescriptor(predicate: samplePredicate,
+                                                               options: .mostRecent,
+                                                               anchorDate: endDate,
+                                                               intervalComponents: .init(day: 1))
+        do {
+            let weightCounts = try await weightsQuery.result(for: store)
+            weightDiffData = weightCounts.statistics().map {
                 HealthMetric(date: $0.startDate, value: $0.mostRecentQuantity()?.doubleValue(for: .pound()) ?? 0)
             }
         } catch {
