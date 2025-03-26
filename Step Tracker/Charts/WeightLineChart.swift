@@ -20,6 +20,7 @@ struct WeightLineChart: View {
     }
     
     var averageWeight: Int {
+        guard !chartData.isEmpty else { return 0 }
         let total = chartData.reduce(0) { $0 + $1.value }
         return Int(total) / chartData.count
     }
