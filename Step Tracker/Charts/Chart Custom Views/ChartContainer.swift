@@ -7,21 +7,75 @@
 
 import SwiftUI
 
-struct ChartContainerConfiguration {
-    let title: String
-    let symbol: String
-    let subtitle: String
-    let context: HealthMetricContext
-    let isNav: Bool
+enum ChartType {
+    case stepBar(average: Int)
+    case stepWeekdayPie
+    case weightLine(average: Double)
+    case weightDiffBar
+    
+    var title: String {
+        switch self {
+        case .stepBar:
+            "Steps"
+        case .stepWeekdayPie:
+            "Averages"
+        case .weightLine:
+            "Weight"
+        case .weightDiffBar:
+            "Average Weight Change"
+        }
+    }
+    
+    var symbol: String {
+        switch self {
+        case .stepBar:
+            "figure.walk"
+        case .stepWeekdayPie:
+            "calendar"
+        case .weightLine, .weightDiffBar:
+            "figure"
+        }
+    }
+    
+    var subtitle: String {
+        switch self {
+        case .stepBar(let average):
+            "Avg: \(average.formatted()) Steps"
+        case .stepWeekdayPie:
+            "Last 28 days"
+        case .weightLine(let average):
+            "Avg: \(average.formatted(.number.precision(.fractionLength(1)))) lbs"
+        case .weightDiffBar:
+            "Per Weekday (Last 28 days)"
+        }
+    }
+    
+    var context: HealthMetricContext {
+        switch self {
+        case .stepBar, .stepWeekdayPie:
+            .steps
+        case .weightLine, .weightDiffBar:
+            .weight
+        }
+    }
+    
+    var isNav: Bool {
+        switch self {
+        case .stepBar, .weightLine:
+            true
+        case .stepWeekdayPie, .weightDiffBar:
+            false
+        }
+    }
 }
 
 struct ChartContainer<Content: View>: View {
-    let config: ChartContainerConfiguration
+    let chartType: ChartType
     @ViewBuilder var content: () -> Content
     
     var body: some View {
         VStack(alignment: .leading) {
-            if config.isNav {
+            if chartType.isNav {
                 navigationView
             } else {
                 titleView
@@ -36,7 +90,7 @@ struct ChartContainer<Content: View>: View {
     }
     
     var navigationView: some View {
-        NavigationLink(value: config.context) {
+        NavigationLink(value: chartType.context) {
             HStack {
                 titleView
                 Spacer()
@@ -49,17 +103,17 @@ struct ChartContainer<Content: View>: View {
     
     var titleView: some View {
         VStack(alignment: .leading) {
-            Label(config.title, systemImage: config.symbol)
+            Label(chartType.title, systemImage: chartType.symbol)
                 .font(.title3)
-                .foregroundStyle(config.context == .steps ? .pink : .indigo)
-            Text(config.subtitle)
+                .foregroundStyle(chartType.context == .steps ? .pink : .indigo)
+            Text(chartType.subtitle)
                 .font(.caption)
         }
     }
 }
 
 #Preview {
-    ChartContainer(config: .init(title: "Test title", symbol: "figure.walk", subtitle: "Test subtitle", context: .steps, isNav: true)) {
+    ChartContainer(chartType: .stepWeekdayPie) {
         Text("Chart goes here")
             .frame(height: 150)
     }
