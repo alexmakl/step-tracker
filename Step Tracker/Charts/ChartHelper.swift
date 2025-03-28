@@ -12,12 +12,6 @@ struct ChartHelper {
         data.map { DateValueChartData(date: $0.date, value: $0.value)}
     }
     
-    static func averageValue(for data: [DateValueChartData]) -> Double {
-        guard !data.isEmpty else { return 0 }
-        let totalStepsCount = data.reduce(0) { $0 + $1.value }
-        return totalStepsCount / Double(data.count)
-    }
-    
     static func parseSelectedDate(from data: [DateValueChartData], in selectedDate: Date?) -> DateValueChartData? {
         guard let selectedDate else { return nil }
         return data.first {
