@@ -29,10 +29,10 @@ struct MockData {
         return array
     }
     
-    static var weightDiffs: [WeekdayChartData] {
-        var array: [WeekdayChartData] = []
+    static var weightDiffs: [DateValueChartData] {
+        var array: [DateValueChartData] = []
         for i in 0..<7 {
-            let metric = WeekdayChartData(date: Calendar.current.date(byAdding: .day, value: -i, to: .now)!,
+            let metric = DateValueChartData(date: Calendar.current.date(byAdding: .day, value: -i, to: .now)!,
                                           value: .random(in: (-2...2)))
             array.append(metric)
         }
