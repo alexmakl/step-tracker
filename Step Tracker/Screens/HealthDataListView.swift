@@ -28,7 +28,9 @@ struct HealthDataListView: View {
                 Text(item.value, format: .number.precision(.fractionLength(metric == .steps ? 0 : 1)))
             } label: {
                 Text(item.date, format: .dateTime.month().day().year())
+                    .accessibilityLabel(item.date.accessibilityDate)
             }
+            .accessibilityElement(children: .combine)
         }
         .navigationTitle(metric.title)
         .sheet(isPresented: $isShowingAddData) {
@@ -45,12 +47,15 @@ struct HealthDataListView: View {
         NavigationStack {
             Form {
                 DatePicker("Date", selection: $addDataDate, displayedComponents: .date)
-                LabeledContent(metric.title) {
+                HStack {
+                    Text(metric.title)
+                    Spacer()
                     TextField("Value", text: $valueToAdd)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 140)
                         .keyboardType(metric == .steps ? .numberPad : .decimalPad)
                 }
+                .accessibilityElement(children: .combine)
             }
             .navigationTitle(metric.title)
             .alert(isPresented: $isShowingAlert, error: writeError, actions: { writeError in
