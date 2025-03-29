@@ -27,6 +27,7 @@ struct ChartEmptyView: View {
         }
         .foregroundStyle(.secondary)
         .offset(y: -8)
+        .accessibilityElement(children: .combine)
     }
 }
 
